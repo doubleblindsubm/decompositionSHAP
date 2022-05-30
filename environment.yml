@@ -1,0 +1,10 @@
+name: decomposition-shap
+dependencies:
+  - python=3.8
+  - scikit-learn
+  - xgboost
+  - matplotlib
+  - pandas
+  - shap
+  - pytest
+  - statsmodels
