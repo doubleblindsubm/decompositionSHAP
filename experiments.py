@@ -1,5 +1,6 @@
 import pickle
 import matplotlib
+import pingouin as pg
 
 import numpy as np
 import xgboost as xgb
@@ -12,6 +13,7 @@ from sklearn.model_selection import train_test_split
 from helpers import get_file_path, load_algerian
 from distributions import MultiGaussian, GaussianCopula
 from force_dependent import force_dependent_plot
+from force_interventional import force_plot
 from kernel_dependent import DependentKernelExplainer
 import os
 
@@ -27,7 +29,6 @@ if not os.path.exists(get_file_path(figure_folder)):
 seed = 5
 
 np.random.seed(seed)
-
 
 ### Simulated example from introduction
 
@@ -124,7 +125,8 @@ forest.load_model(save_folder + 'forest.model')
 data = load_boston()
 sample_index = 16
 plt.close()
-fig = force_dependent_plot(np.mean(forest.predict(x_train)), forest_shaps_cond_all[sample_index], features=x_train[sample_index],
+fig = force_dependent_plot(np.mean(forest.predict(x_train)), forest_shaps_cond_all[sample_index],
+                           features=x_train[sample_index],
                            feature_names=data['feature_names'], show=False, text_rotation=-90)
 fig.savefig(figure_folder + "boston{}.png".format(sample_index), bbox_inches="tight")  # Figure 3 in paper
 plt.close()
@@ -133,7 +135,7 @@ plt.close()
 ## Experiment 2: interventional SHAP part for model output correction
 
 def compute_model_output_correction(all_vals, model, max_removed, X=None, dist=None):
-    "Returns model output when most negative features are iterativly mean imputed."
+    "Returns model output when most negative features are iteratively mean imputed."
     nb_samples, nb_inputs = all_vals[0].shape
     if X is None:
         with open(save_folder + 'x_train.txt', 'rb') as fp:
@@ -216,7 +218,7 @@ plot_simple(linear_cond_fs, 'green', 'Conditional SHAP')
 plt.legend(loc="lower right")
 plt.xlabel('Features changed')
 plt.ylabel('Change in median house price (in 1000$)')
-plt.savefig(figure_folder + 'linear_diff.png', dpi=400)  # Figure 4 in paper
+plt.savefig(figure_folder + 'linear_diff.png', dpi=400)  # Figure 4a in paper
 
 plt.close()
 
@@ -226,7 +228,7 @@ plot_with_std(linear_cond_fs, 'green', 'Conditional SHAP')
 plt.legend(loc="lower right")
 plt.xlabel('Features changed')
 plt.ylabel('Change in median house price (in 1000$)')
-plt.savefig(figure_folder + 'linear_diff_std.png', dpi=400)  # Figure 15 in paper
+plt.savefig(figure_folder + 'linear_diff_std.png', dpi=400)  # Figure 2 in supplementary material
 
 plt.close()
 
@@ -237,7 +239,7 @@ plot_with_faded_trajectories(linear_int_part_fs, 'red', 'Interventional SHAP par
 plt.legend(loc="upper left")
 plt.xlabel('Features changed')
 plt.ylabel('Difference with conditional SHAP approach (in 1000$)')
-plt.savefig(figure_folder + 'linear_norm.png', dpi=400)  # Figure 5 in paper
+plt.savefig(figure_folder + 'linear_norm.png', dpi=400)  # Figure 3a in supplementary material
 
 plt.close()
 
@@ -264,7 +266,7 @@ plot_simple(linear_cond_fs, 'green', 'Conditional SHAP')
 plt.legend(loc="lower right")
 plt.xlabel('Features changed')
 plt.ylabel('Change in median house price (in 1000$)')
-plt.savefig(figure_folder + 'linear_diff_c.png', dpi=400)  # Figure 6 in paper
+plt.savefig(figure_folder + 'linear_diff_c.png', dpi=400)  # Figure 4b in paper
 
 plt.close()
 
@@ -275,7 +277,7 @@ plot_with_faded_trajectories(linear_int_part_fs, 'red', 'Interventional SHAP par
 plt.legend(loc="upper left")
 plt.xlabel('Features changed')
 plt.ylabel('Difference with conditional SHAP approach (in 1000$)')
-plt.savefig(figure_folder + 'linear_norm_c.png', dpi=400)  # Figure 7 in paper
+plt.savefig(figure_folder + 'linear_norm_c.png', dpi=400)  # Figure 3b in supplementary material
 
 plt.close()
 
@@ -295,15 +297,13 @@ forest_int_fs, forest_cond_fs, forest_int_part_fs = compute_model_output_correct
 for vals in [forest_int_fs, forest_cond_fs, forest_int_part_fs]:
     vals -= vals[:, 0, np.newaxis]
 
-
-
 plot_simple(forest_int_fs, 'blue', 'Interventional SHAP')
 plot_simple(forest_cond_fs, 'green', 'Conditional SHAP')
 plot_simple(forest_int_part_fs, 'red', 'Interventional SHAP part')
 plt.legend(loc="lower right")
 plt.xlabel('Features changed')
 plt.ylabel('Change in median house price (in 1000$)')
-plt.savefig(figure_folder + 'forest_diff.png', dpi=400)  # Figure 11 in paper
+plt.savefig(figure_folder + 'forest_diff.png', dpi=400)  # Figure 1a in supplementary material
 
 plt.close()
 
@@ -314,7 +314,7 @@ plot_with_faded_trajectories(forest_int_part_fs, 'red', 'Interventional SHAP par
 plt.legend(loc="upper left")
 plt.xlabel('Features changed')
 plt.ylabel('Difference with conditional SHAP approach (in 1000$)')
-plt.savefig(figure_folder + 'forest_norm.png', dpi=400)  # Figure 12 in paper
+plt.savefig(figure_folder + 'forest_norm.png', dpi=400)  # Figure 4a in supplementary material
 
 plt.close()
 
@@ -342,7 +342,7 @@ plot_simple(forest_int_part_fs, 'red', 'Interventional SHAP part')
 plt.legend(loc="lower right")
 plt.xlabel('Features changed')
 plt.ylabel('Change in median house price (in 1000$)')
-plt.savefig(figure_folder + 'forest_diff_c.png', dpi=400)  # Figure 13 in paper
+plt.savefig(figure_folder + 'forest_diff_c.png', dpi=400)  # Figure 1b in supplementary material
 
 plt.close()
 
@@ -353,7 +353,7 @@ plot_with_faded_trajectories(forest_int_part_fs, 'red', 'Interventional SHAP par
 plt.legend(loc="lower right")
 plt.xlabel('Features changed')
 plt.ylabel('Difference with conditional SHAP approach (in 1000$)')
-plt.savefig(figure_folder + 'forest_norm_c.png', dpi=400)  # Figure 14 in paper
+plt.savefig(figure_folder + 'forest_norm_c.png', dpi=400)  # Figure 4b in supplementary material
 
 plt.close()
 
@@ -376,6 +376,8 @@ dist = GaussianCopula(x)
 
 condexp = DependentKernelExplainer(lambda d: model.predict(d, output_margin=True), x, dist.sample)
 
+intexp = KernelExplainer(lambda d: model.predict(d, output_margin=True), x)
+
 # vals_cond_all = condexp.shap_values(x_test)
 
 # with open(save_folder + 'algerian' + '_cond_all.txt', 'wb') as fp:
@@ -384,8 +386,53 @@ condexp = DependentKernelExplainer(lambda d: model.predict(d, output_margin=True
 with open(save_folder + 'algerian' + '_cond_all.txt', 'rb') as fp:
     vals_cond_all = pickle.load(fp)
 
-for sample_index in [6, 27, 32]:
-    fig = force_dependent_plot(np.mean(model.predict(x, output_margin=True)), vals_cond_all[sample_index],
-                               features=x_test[sample_index],
-                               feature_names=list(data.columns)[:-1], show=False, link='logit')
-    fig.savefig(figure_folder + "algerian{}.png".format(sample_index), bbox_inches="tight")  # Figure 8, 10, 9 in paper
+sample_index = 32  # also interesting 6, 27
+fig = force_dependent_plot(np.mean(model.predict(x, output_margin=True)), vals_cond_all[sample_index],
+                           features=x_test[sample_index],
+                           feature_names=list(data.columns)[:-1], show=False, link='logit')
+fig.savefig(figure_folder + "algerian{}.png".format(sample_index), bbox_inches="tight")  # Figure 5a in paper
+
+print(intexp.shap_values(x_test[sample_index]))
+int_fig = force_plot(np.mean(model.predict(x, output_margin=True)), intexp.shap_values(x_test[sample_index]),
+                     features=x_test[sample_index],
+                     feature_names=list(data.columns)[:-1], show=False, link='logit')
+int_fig.savefig(figure_folder + "int_algerian{}.png".format(sample_index), bbox_inches="tight")  # Figure 5b in paper
+
+## Correlation analysis
+
+y_pred = model.predict(x, output_margin=True)
+
+data['Prediction'] = y_pred
+data = data.drop(columns='Classes')
+
+# vals_cond_x = condexp.shap_values(x)
+#
+# with open(save_folder + 'algerian' + '_cond_x.txt', 'wb') as fp:
+#     pickle.dump(vals_cond_x, fp)
+
+with open(save_folder + 'algerian' + '_cond_x.txt', 'rb') as fp:
+    vals_cond_x = pickle.load(fp)
+
+nb_features = 4
+
+dependent_part = vals_cond_x[:, :nb_features] - vals_cond_x[:, nb_features:]
+int_part = vals_cond_x[:, nb_features:]
+
+# Values used in Figure 6 in paper
+for feature1 in data.columns:
+    for feature2 in data.columns:
+        if feature2 != feature1:
+            par_cor = pg.partial_corr(data, feature1, feature2,
+                                      [f for f in data.columns if f != feature1 and f != feature2], method='spearman')
+
+            print(feature1, feature2, par_cor.iloc[0]['r'], 2 * par_cor.iloc[0]['r'])
+
+dependent_corr = []
+int_corr = []
+for i in range(nb_features):
+    dependent_corr += [pg.corr(dependent_part[:, i], data.iloc[:, i], method='spearman').iloc[0]['r']]
+    int_corr += [pg.corr(int_part[:, i], data.iloc[:, i], method='spearman').iloc[0]['r']]
+
+# Values used in Table 2 of paper
+print('dep_corr', dependent_corr)
+print('int_corr', int_corr)

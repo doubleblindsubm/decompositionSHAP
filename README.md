@@ -13,6 +13,9 @@
 - `force_dependent.py` holds implementation of force plot visualizations with interventional and dependent effects
     - function `force_dependent_plot(...)` visualizes the given SHAP values and interventional effects in a matplotlib
       force plot. See code documentation for information on arguments.
+- `force_int.py` holds implementation of force plot visualizations with interventional and dependent effects
+    - function `force_dependent_plot(...)` visualizes the given SHAP values and interventional effects in a matplotlib
+      force plot. See code documentation for information on arguments.
 - `helpers.py` some helpers functions
 - `kernel_dependent.py` holds functions that can compute interventional and dependent effects
     - class `DependentKernelExplainer` explains output of any function for any situation by decomposing the Shapley
