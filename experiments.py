@@ -106,11 +106,11 @@ def setup_shap(model, save_name, nb_samples=100, x=None, dist=None):
 
 
 # Setup everything time-consuming beforehand, this can be commented out when run the second time
-# setup_data()
-# forest = setup_forest('forest')
-# linear = setup_linear('linear')
-# setup_shap(forest, 'forest_shaps')
-# setup_shap(linear, 'linear_shaps')
+setup_data()
+forest = setup_forest('forest')
+linear = setup_linear('linear')
+setup_shap(forest, 'forest_shaps')
+setup_shap(linear, 'linear_shaps')
 
 ## Experiment 1: plot some SHAP values for Boston dataset
 
@@ -378,13 +378,14 @@ condexp = DependentKernelExplainer(lambda d: model.predict(d, output_margin=True
 
 intexp = KernelExplainer(lambda d: model.predict(d, output_margin=True), x)
 
-# vals_cond_all = condexp.shap_values(x_test)
 
-# with open(save_folder + 'algerian' + '_cond_all.txt', 'wb') as fp:
-#     pickle.dump(vals_cond_all, fp)
+vals_cond_all = condexp.shap_values(x_test)
 
-with open(save_folder + 'algerian' + '_cond_all.txt', 'rb') as fp:
-    vals_cond_all = pickle.load(fp)
+with open(save_folder + 'algerian' + '_cond_all.txt', 'wb') as fp:
+    pickle.dump(vals_cond_all, fp)
+
+# with open(save_folder + 'algerian' + '_cond_all.txt', 'rb') as fp:
+#     vals_cond_all = pickle.load(fp)
 
 sample_index = 32  # also interesting 6, 27
 fig = force_dependent_plot(np.mean(model.predict(x, output_margin=True)), vals_cond_all[sample_index],
@@ -405,13 +406,13 @@ y_pred = model.predict(x, output_margin=True)
 data['Prediction'] = y_pred
 data = data.drop(columns='Classes')
 
-# vals_cond_x = condexp.shap_values(x)
-#
-# with open(save_folder + 'algerian' + '_cond_x.txt', 'wb') as fp:
-#     pickle.dump(vals_cond_x, fp)
+vals_cond_x = condexp.shap_values(x)
 
-with open(save_folder + 'algerian' + '_cond_x.txt', 'rb') as fp:
-    vals_cond_x = pickle.load(fp)
+with open(save_folder + 'algerian' + '_cond_x.txt', 'wb') as fp:
+    pickle.dump(vals_cond_x, fp)
+
+# with open(save_folder + 'algerian' + '_cond_x.txt', 'rb') as fp:
+#     vals_cond_x = pickle.load(fp)
 
 nb_features = 4
 
